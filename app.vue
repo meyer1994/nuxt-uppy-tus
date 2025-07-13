@@ -1,22 +1,52 @@
 <script setup lang="ts">
-import { useForm } from '@tanstack/vue-form'
-import type { FieldApi } from '@tanstack/vue-form'
-import { z } from 'zod'
+import type { FileUploadUploaderEvent } from 'primevue/fileupload'
+import type { Schema } from '~/server/api/upload/image.post'
 
-// Types
-interface FormData { image: File | null }
+const toast = useToast()
 
-// Zod validation schema
-const schema = z
-  .instanceof(File)
-  .refine(file => file.type.startsWith('image/'), {
-    message: 'Please select an image file',
+const onUpload = async (event: FileUploadUploaderEvent) => {
+  if (!event.files) return
+
+  const file = Array.isArray(event.files) ? event.files[0] : event.files
+  const blob = new Blob([file], { type: file.type })
+
+  const form = new FormData()
+  form.append('file', blob)
+
+  const response = await fetch('/api/upload/image', {
+    method: 'POST',
+    body: form,
   })
-  .refine(file => file.size <= 10 * 1024 * 1024, {
-    message: 'File size must be less than 10MB',
-  })
+
+  const data: Schema = await response.json()
+  if (!data.isDocument) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'The uploaded image is not a government issued document',
+    })
+    return
+  }
+}
 </script>
 
 <template>
-  <Card />
+  <div class="flex justify-center items-center p-4">
+    <Toast />
+    <Card>
+      <template #title>
+        <h1>Hello World</h1>
+      </template>
+      <template #content>
+        <FileUpload
+          mode="basic"
+          accept="image/*"
+          url="/api/upload/image"
+          :auto="true"
+          :custom-upload="true"
+          @uploader="onUpload"
+        />
+      </template>
+    </Card>
+  </div>
 </template>

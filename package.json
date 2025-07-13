@@ -10,9 +10,14 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@ai-sdk/openai": "2.0.0-beta.7",
+    "@langchain/core": "^0.3.62",
+    "@langchain/openai": "^0.5.18",
     "@primeuix/themes": "^1.2.1",
-    "@tanstack/vue-form": "^1.14.0",
+    "@primevue/forms": "^4.3.6",
+    "ai": "5.0.0-beta.16",
     "eslint": "^9.31.0",
+    "langchain": "^0.3.29",
     "nuxt": "^3.17.6",
     "primevue": "^4.3.6",
     "vue": "^3.5.17",

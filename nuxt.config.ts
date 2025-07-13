@@ -4,6 +4,13 @@ import Material from '@primeuix/themes/material'
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@primevue/nuxt-module', '@nuxtjs/tailwindcss'],
   devtools: { enabled: true },
+
+  runtimeConfig: {
+    openai: {
+      apiKey: process.env.OPENAI_API_KEY,
+    },
+  },
+
   compatibilityDate: '2025-05-15',
   typescript: { typeCheck: true },
 
