@@ -18,6 +18,12 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2025-05-15',
+
+  nitro: {
+    preset: 'aws-lambda',
+    inlineDynamicImports: false, // ideal for AWS lambda
+  },
+
   typescript: { typeCheck: true },
 
   eslint: {
