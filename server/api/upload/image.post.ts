@@ -10,8 +10,8 @@ const schema = z.object({
     .describe('Name of the document if detected'),
   dateOfBirth: z.string().optional()
     .describe('Date of birth if detected'),
-  dateOfExpiry: z.string().optional()
-    .describe('Date of expiry if detected'),
+  placeOfBirth: z.string().optional()
+    .describe('Place of birth if detected'),
   documentNumber: z.string().optional()
     .describe('Document number if detected'),
   fatherName: z.string().optional()
@@ -63,6 +63,5 @@ export default defineEventHandler(async (event: H3Event): Promise<Schema> => {
   })
 
   console.info('AI Analysis Result:', response.object)
-
-  return response.object
+  return response.object as unknown as Schema
 })

@@ -3,7 +3,13 @@ import Material from '@primeuix/themes/material'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@primevue/nuxt-module', '@nuxtjs/tailwindcss'],
-  devtools: { enabled: true },
+
+  devtools: {
+    enabled: true,
+    timeline: {
+      enabled: true,
+    },
+  },
 
   runtimeConfig: {
     openai: {
