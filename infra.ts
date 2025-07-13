@@ -16,13 +16,11 @@ export class Nuxt extends Stack {
       functionName: `${id}-function`,
       description: 'Hosts the NuxtJS app',
       handler: 'server/index.handler',
-
-      //
-      code: lambda.Code.fromCustomCommand('.output', ['pnpx', 'nuxt', 'build']),
+      code: lambda.Code.fromCustomCommand('.output', ['pnpm', 'run', 'build']),
       memorySize: 128,
-      runtime: lambda.Runtime.NODEJS_20_X, // profiling not supported for NODEJS_22_X
+      runtime: lambda.Runtime.NODEJS_22_X,
       timeout: Duration.seconds(15),
-      profiling: true,
+      // profiling: true, // not supported for node
       tracing: lambda.Tracing.ACTIVE,
       logGroup: new logs.LogGroup(this, `${id}-function-logs`, {
         logGroupName: `${id}-function`,
@@ -30,7 +28,7 @@ export class Nuxt extends Stack {
         retention: logs.RetentionDays.THREE_DAYS,
       }),
       environment: {
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY!,
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY || '', // Provide a default empty string if not set
       },
     })
 
@@ -40,8 +38,8 @@ export class Nuxt extends Stack {
       description: 'Proxy API for OpenAI requests',
       // Deployment
       deploy: true,
-      retainDeployments: false,
       handler: func,
+      retainDeployments: false,
       // Method
       defaultMethodOptions: {
         authorizationType: apigateway.AuthorizationType.NONE,
@@ -74,10 +72,6 @@ export class Nuxt extends Stack {
           protocol: true,
           responseLength: true,
         }),
-        // OpenAI API Key
-        variables: {
-          OPENAI_API_KEY: process.env.OPENAI_API_KEY!,
-        },
       },
       // Cloudwatch
       cloudWatchRole: true,

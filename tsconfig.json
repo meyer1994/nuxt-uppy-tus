@@ -1,5 +1,7 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
   "extends": "./.nuxt/tsconfig.json",
+  // if we don't exclude cdk.out, the build will fail with some maximum
+  // recursion error
   "exclude": ["cdk.out"]
 }
