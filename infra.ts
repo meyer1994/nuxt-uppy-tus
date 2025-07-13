@@ -107,5 +107,5 @@ export class Nuxt extends Stack {
 }
 
 const app = new App()
-new Nuxt(app, 'nuxt')
+new Nuxt(app, 'bruch')
 app.synth()
