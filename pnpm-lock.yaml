@@ -57,6 +57,12 @@ importers:
       '@primevue/nuxt-module':
         specifier: ^4.3.6
         version: 4.3.6(@babel/parser@7.28.0)(magicast@0.3.5)(vue@3.5.17(typescript@5.8.3))
+      aws-cdk:
+        specifier: ^2.1020.2
+        version: 2.1020.2
+      aws-cdk-lib:
+        specifier: ^2.204.0
+        version: 2.204.0(constructs@10.4.2)
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -102,6 +108,19 @@ packages:
   '@apidevtools/json-schema-ref-parser@11.9.3':
     resolution: {integrity: sha512-60vepv88RwcJtSHrD6MjIL6Ta3SOYbgfnkHb+ppAVK+o9mXprRtulx7VlRl3lN3bbvysAfCS7WMVfhUYemB0IQ==}
     engines: {node: '>= 16'}
+
+  '@aws-cdk/asset-awscli-v1@2.2.242':
+    resolution: {integrity: sha512-4c1bAy2ISzcdKXYS1k4HYZsNrgiwbiDzj36ybwFVxEWZXVAP0dimQTCaB9fxu7sWzEjw3d+eaw6Fon+QTfTIpQ==}
+
+  '@aws-cdk/asset-node-proxy-agent-v6@2.1.0':
+    resolution: {integrity: sha512-7bY3J8GCVxLupn/kNmpPc5VJz8grx+4RKfnnJiO1LG+uxkZfANZG3RMHhE+qQxxwkyQ9/MfPtTpf748UhR425A==}
+
+  '@aws-cdk/cloud-assembly-schema@45.2.0':
+    resolution: {integrity: sha512-5TTUkGHQ+nfuUGwKA8/Yraxb+JdNUh4np24qk/VHXmrCMq+M6HfmGWfhcg/QlHA2S5P3YIamfYHdQAB4uSNLAg==}
+    engines: {node: '>= 18.0.0'}
+    bundledDependencies:
+      - jsonschema
+      - semver
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -1658,6 +1677,29 @@ packages:
     peerDependencies:
       postcss: ^8.1.0
 
+  aws-cdk-lib@2.204.0:
+    resolution: {integrity: sha512-mY3nYu+QvPhO+fz+LCFKbc0PFhTHbHzDLnbcA2fPcQBKciYnTixpBd2ccRlKYWbG4y6NTc6ju6DudZ3HIS4OlA==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      constructs: ^10.0.0
+    bundledDependencies:
+      - '@balena/dockerignore'
+      - case
+      - fs-extra
+      - ignore
+      - jsonschema
+      - minimatch
+      - punycode
+      - semver
+      - table
+      - yaml
+      - mime-types
+
+  aws-cdk@2.1020.2:
+    resolution: {integrity: sha512-yWdt3dJh4aPm1VNyEgfG3lozGrvddw0i7avt+Cl9KOYixmisQtAg39/aZqzVVqjzVZVEanXmz+tlhzzh75Z69A==}
+    engines: {node: '>= 18.0.0'}
+    hasBin: true
+
   b4a@1.6.7:
     resolution: {integrity: sha512-OnAYlL5b7LEkALw87fUVafQw5rVR9RjwGd4KUwNQ6DrrNmaVaUCgLipfVlzrPQ4tWOR9P0IXGNOx50jYCCdSJg==}
 
@@ -1897,6 +1939,9 @@ packages:
 
   console-table-printer@2.14.6:
     resolution: {integrity: sha512-MCBl5HNVaFuuHW6FGbL/4fB7N/ormCy+tQ+sxTrF6QtSbSNETvPuOVbkJBhzDgYhvjWGrTma4eYJa37ZuoQsPw==}
+
+  constructs@10.4.2:
+    resolution: {integrity: sha512-wsNxBlAott2qg8Zv87q3eYZYgheb9lchtBfjHzzLHtXbttwSrHPs1NNQbBrmbb1YZvYg2+Vh0Dor76w4mFxJkA==}
 
   content-disposition@0.5.4:
     resolution: {integrity: sha512-FveZTNuGw04cxlAiWbzi6zTAL/lhehaWbTtgluJh4/E95DqMwTmha3KZN1aAWA8cFIhHzMZUvLevkw5Rqk+tSQ==}
@@ -2558,6 +2603,11 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
+
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -4943,6 +4993,12 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.1.0
 
+  '@aws-cdk/asset-awscli-v1@2.2.242': {}
+
+  '@aws-cdk/asset-node-proxy-agent-v6@2.1.0': {}
+
+  '@aws-cdk/cloud-assembly-schema@45.2.0': {}
+
   '@babel/code-frame@7.27.1':
     dependencies:
       '@babel/helper-validator-identifier': 7.27.1
@@ -6740,6 +6796,17 @@ snapshots:
       postcss: 8.5.6
       postcss-value-parser: 4.2.0
 
+  aws-cdk-lib@2.204.0(constructs@10.4.2):
+    dependencies:
+      '@aws-cdk/asset-awscli-v1': 2.2.242
+      '@aws-cdk/asset-node-proxy-agent-v6': 2.1.0
+      '@aws-cdk/cloud-assembly-schema': 45.2.0
+      constructs: 10.4.2
+
+  aws-cdk@2.1020.2:
+    optionalDependencies:
+      fsevents: 2.3.2
+
   b4a@1.6.7: {}
 
   balanced-match@1.0.2: {}
@@ -6971,6 +7038,8 @@ snapshots:
   console-table-printer@2.14.6:
     dependencies:
       simple-wcswidth: 1.1.2
+
+  constructs@10.4.2: {}
 
   content-disposition@0.5.4:
     dependencies:
@@ -7679,6 +7748,9 @@ snapshots:
       universalify: 2.0.1
 
   fs.realpath@1.0.0: {}
+
+  fsevents@2.3.2:
+    optional: true
 
   fsevents@2.3.3:
     optional: true

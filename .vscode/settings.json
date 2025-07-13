@@ -11,7 +11,8 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
     }
   },
 
@@ -20,7 +21,8 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
     }
   },
 
@@ -29,7 +31,8 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
     }
   },
 
@@ -38,7 +41,8 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
     }
   },
 
@@ -47,7 +51,8 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
     }
   }
 }
