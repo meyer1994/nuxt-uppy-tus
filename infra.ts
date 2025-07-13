@@ -15,10 +15,12 @@ export class Nuxt extends Stack {
     const func = new lambda.Function(this, 'function', {
       functionName: `${id}-function`,
       description: 'Hosts the NuxtJS app',
-      handler: 'handler.handler',
-      code: lambda.Code.fromCustomCommand('.output', ['pnpm', 'run', 'build']),
+      handler: 'server/index.handler',
+
+      //
+      code: lambda.Code.fromCustomCommand('.output', ['pnpx', 'nuxt', 'build']),
       memorySize: 128,
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_20_X, // profiling not supported for NODEJS_22_X
       timeout: Duration.seconds(15),
       profiling: true,
       tracing: lambda.Tracing.ACTIVE,
@@ -96,7 +98,7 @@ export class Nuxt extends Stack {
     // request by API Gateway. By creating one with the same name as the log
     // group, we can ensure that the log group is created before the first
     // request and apply all configurations we want.
-    const log = new logs.LogGroup(this, `${id}-rest-logs`, {
+    const _log = new logs.LogGroup(this, `${id}-rest-logs`, {
       logGroupName: `API-Gateway-Execution-Logs_${rest.restApiId}/${stage.stageName}`,
       retention: logs.RetentionDays.THREE_DAYS,
       removalPolicy: RemovalPolicy.DESTROY,
