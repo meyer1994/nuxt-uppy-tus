@@ -1,7 +1,7 @@
-import { z } from 'zod'
-import { generateObject } from 'ai'
 import { openai } from '@ai-sdk/openai'
+import { generateObject } from 'ai'
 import type { H3Event } from 'h3'
+import { z } from 'zod'
 
 const schema = z.object({
   isDocument: z.boolean()
@@ -63,5 +63,5 @@ export default defineEventHandler(async (event: H3Event): Promise<Schema> => {
   })
 
   console.info('AI Analysis Result:', response.object)
-  return response.object as unknown as Schema
+  return response.object
 })
