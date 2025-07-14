@@ -60,8 +60,8 @@ const uploader = ({ files }: FileUploadUploaderEvent) => {
         name="file"
         :auto="true"
         choose-label="Escolher"
-        @select="onSelect"
         :custom-upload="true"
+        @select="onSelect"
         @uploader="uploader"
       />
 
@@ -106,6 +106,7 @@ const uploader = ({ files }: FileUploadUploaderEvent) => {
             >
               <li><strong>Nome:</strong> {{ result.name }}</li>
               <li><strong>Número do documento:</strong> {{ result.documentNumber }}</li>
+              <li><strong>CPF:</strong> {{ result.cpf }}</li>
               <li><strong>Data de nascimento:</strong> {{ result.dateOfBirth }}</li>
               <li><strong>Local de nascimento:</strong> {{ result.placeOfBirth }}</li>
               <li><strong>Nome do pai:</strong> {{ result.fatherName }}</li>
