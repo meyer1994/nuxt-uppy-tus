@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FileUploadSelectEvent, FileUploadUploaderEvent, FileUploadUploadEvent } from 'primevue/fileupload'
+import type { FileUploadSelectEvent, FileUploadUploaderEvent } from 'primevue/fileupload'
 import type { Schema } from '~/server/api/upload/image.post'
 
 const isLoading = ref(false)
@@ -7,22 +7,22 @@ const result = ref<Schema | null>(null)
 const preview = ref<string | null>(null)
 
 const onSelect = ({ files }: FileUploadSelectEvent) => {
+  console.info('onSelect')
   if (!files) return
   const file = files[0]
   preview.value = URL.createObjectURL(file)
 }
 
-const onBeforeUpload = () => {
-  isLoading.value = true
-}
-
-const uploader = async ({ files }: FileUploadUploaderEvent) => {
+const uploader = ({ files }: FileUploadUploaderEvent) => {
   if (!files) return
-  const file = Array.isArray(files) ? files[0] : files
+  if (isLoading.value) return
 
+  result.value = null
+  isLoading.value = true
+
+  const file = Array.isArray(files) ? files[0] : files
   const reader = new FileReader()
-  reader.readAsDataURL(file)
-  
+
   reader.onload = async () => {
     const base64Url = reader.result as string
     const [_, base64] = base64Url.split(';base64,')
@@ -30,13 +30,10 @@ const uploader = async ({ files }: FileUploadUploaderEvent) => {
       method: 'POST',
       body: { image: base64, type: file.type, name: file.name },
     })
+    isLoading.value = false
   }
-}
 
-const onUpload = ({ xhr }: FileUploadUploadEvent) => {
-  const response: Schema = JSON.parse(xhr.response)
-  result.value = response
-  isLoading.value = false
+  reader.readAsDataURL(file)
 }
 </script>
 
@@ -63,8 +60,6 @@ const onUpload = ({ xhr }: FileUploadUploadEvent) => {
         name="file"
         :auto="true"
         choose-label="Escolher"
-        @upload="onUpload"
-        @before-upload="onBeforeUpload"
         @select="onSelect"
         :custom-upload="true"
         @uploader="uploader"
@@ -99,7 +94,7 @@ const onUpload = ({ xhr }: FileUploadUploadEvent) => {
             </h2>
             <ProgressSpinner
               v-if="isLoading"
-              class="max-h-[0.8em] max-w-[1em] ml-2"
+              class="h-[1em] w-[1em] ml-2"
             />
           </div>
 
