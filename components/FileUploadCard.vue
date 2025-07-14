@@ -88,14 +88,13 @@ const uploader = ({ files }: FileUploadUploaderEvent) => {
 
         <div v-if="preview">
           <!-- Header -->
-          <div class="flex justify-between items-center">
+          <div class="flex justify-start items-center gap-2">
             <h2 class="text-lg font-bold">
               Resultado
             </h2>
-            <ProgressSpinner
-              v-if="isLoading"
-              class="h-[1em] w-[1em] ml-2"
-            />
+            <div v-if="isLoading">
+              <ProgressSpinner class="max-h-[1em] max-w-[1em]" />
+            </div>
           </div>
 
           <!-- Result -->
