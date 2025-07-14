@@ -26,16 +26,19 @@ const schema = z.object({
 
 export type Schema = z.infer<typeof schema>
 
+const bodySchema = z.object({
+  image: z.string().base64(),
+  type: z.string(),
+  name: z.string(),
+})
+
 export default defineEventHandler(async (event: H3Event): Promise<Schema> => {
-  const data = await readMultipartFormData(event)
-  if (!data) throw createError({ status: 400 })
-  const image = data[0]
+  const body = await readValidatedBody(event, i => bodySchema.parse(i))
 
-  console.info(`Image name: ${image.filename}`)
-  console.info(`Image size: ${image.data.length} bytes`)
-  console.info(`Image type: ${image.type}`)
-
-  const base64Image = image.data.toString('base64')
+  console.info(`Image type: ${body.type}`)
+  console.info(`Image name: ${body.name}`)
+  console.info(`Image size: ${body.image.length} bytes`)
+  console.info(`Image base64: ${body.image.slice(0, 256)}...`)
 
   // Analyze the image with AI
   const response = await generateObject<typeof schema>({
@@ -55,7 +58,7 @@ export default defineEventHandler(async (event: H3Event): Promise<Schema> => {
           },
           {
             type: 'image',
-            image: `data:${image.type};base64,${base64Image}`,
+            image: body.image,
           },
         ],
       },

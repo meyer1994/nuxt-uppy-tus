@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FileUploadSelectEvent, FileUploadUploadEvent } from 'primevue/fileupload'
+import type { FileUploadSelectEvent, FileUploadUploaderEvent, FileUploadUploadEvent } from 'primevue/fileupload'
 import type { Schema } from '~/server/api/upload/image.post'
 
 const isLoading = ref(false)
@@ -14,6 +14,23 @@ const onSelect = ({ files }: FileUploadSelectEvent) => {
 
 const onBeforeUpload = () => {
   isLoading.value = true
+}
+
+const uploader = async ({ files }: FileUploadUploaderEvent) => {
+  if (!files) return
+  const file = Array.isArray(files) ? files[0] : files
+
+  const reader = new FileReader()
+  reader.readAsDataURL(file)
+  
+  reader.onload = async () => {
+    const base64Url = reader.result as string
+    const [_, base64] = base64Url.split(';base64,')
+    result.value = await $fetch<Schema>('/api/upload/image', {
+      method: 'POST',
+      body: { image: base64, type: file.type, name: file.name },
+    })
+  }
 }
 
 const onUpload = ({ xhr }: FileUploadUploadEvent) => {
@@ -49,6 +66,8 @@ const onUpload = ({ xhr }: FileUploadUploadEvent) => {
         @upload="onUpload"
         @before-upload="onBeforeUpload"
         @select="onSelect"
+        :custom-upload="true"
+        @uploader="uploader"
       />
 
       <!-- Contents -->

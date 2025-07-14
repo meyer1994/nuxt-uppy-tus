@@ -8,6 +8,10 @@ import {
   Stack,
 } from 'aws-cdk-lib'
 
+import dotenv from 'dotenv'
+
+dotenv.config()
+
 export class Nuxt extends Stack {
   constructor(scope: App, id: string) {
     super(scope, id)
@@ -28,9 +32,16 @@ export class Nuxt extends Stack {
         retention: logs.RetentionDays.THREE_DAYS,
       }),
       environment: {
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY || '', // Provide a default empty string if not set
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
       },
     })
+
+    const url = new lambda.FunctionUrl(this, `${id}-function-url`, {
+      function: func,
+      authType: lambda.FunctionUrlAuthType.NONE,
+    })
+    url.applyRemovalPolicy(RemovalPolicy.DESTROY)
+    return
 
     // Rest API
     const rest = new apigateway.LambdaRestApi(this, `${id}-rest`, {
@@ -83,7 +94,7 @@ export class Nuxt extends Stack {
 
     // Gets the stage. Used later for metrics
     const stage = apigateway.Stage.fromStageAttributes(this, `${id}-stage`, {
-      stageName: 'v0',
+      stageName: 'prod',
       restApi: rest,
     })
 

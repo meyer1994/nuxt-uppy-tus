@@ -21,7 +21,8 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'aws-lambda',
-    inlineDynamicImports: false, // ideal for AWS lambda
+    serveStatic: true,
+    inlineDynamicImports: true, // ideal for AWS lambda
   },
 
   typescript: { typeCheck: true },
