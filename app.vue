@@ -1,6 +1,9 @@
 <template>
-  <div class="flex flex-col justify-center items-center p-4">
+  <main>
     <Toast />
-    <FileUploadCard />
-  </div>
+    <div class="grid grid-cols-2 gap-4">
+      <ImageUploadCard />
+      <PdfUploadCard />
+    </div>
+  </main>
 </template>

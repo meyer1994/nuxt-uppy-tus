@@ -2,28 +2,12 @@ import { openai } from '@ai-sdk/openai'
 import { generateObject } from 'ai'
 import type { H3Event } from 'h3'
 import { z } from 'zod'
+import { identity } from '~/shared/schemas'
 
 const schema = z.object({
   isDocument: z.boolean()
     .describe('True if the image contains a Brazilian government-issued identity document (CIN, RG, CNH, passaporte, etc.)'),
-  name: z.string().optional()
-    .describe('Full name of the document holder as it appears on the document (e.g., "JOÃO SILVA SANTOS")'),
-  dateOfBirth: z.string().optional()
-    .describe('Date of birth in DD/MM/YYYY format as shown on Brazilian documents (e.g., "15/03/1990")'),
-  placeOfBirth: z.string().optional()
-    .describe('Place of birth (naturalidade) including city and state (e.g., "SÃO PAULO/SP", "RIO DE JANEIRO/RJ")'),
-  documentNumber: z.string().optional()
-    .describe('Document identification number - could be RG number, CPF, or CIN number (e.g., "12.345.678-9", "123.456.789-10")'),
-  cpf: z.string().optional()
-    .describe('CPF (Cadastro de Pessoa Física) - Brazilian taxpayer ID number in format XXX.XXX.XXX-XX (e.g., "123.456.789-01")'),
-  fatherName: z.string().optional()
-    .describe('Father\'s full name as listed in the "Filiação" section (e.g., "JOSÉ SILVA SANTOS")'),
-  motherName: z.string().optional()
-    .describe('Mother\'s full name as listed in the "Filiação" section (e.g., "MARIA SANTOS SILVA")'),
-  gender: z.string().optional()
-    .describe('Gender/sex as indicated on the document - typically "M" for Masculino or "F" for Feminino'),
-  nationality: z.string().optional()
-    .describe('Nationality as shown on the document - typically "BRA" for Brazilian or "BRASILEIRA"'),
+  identity: identity,
 })
 
 export type Schema = z.infer<typeof schema>

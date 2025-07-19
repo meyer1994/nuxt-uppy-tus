@@ -104,15 +104,15 @@ const uploader = ({ files }: FileUploadUploaderEvent) => {
               v-if="result.isDocument"
               class="text-sm"
             >
-              <li><strong>Nome:</strong> {{ result.name }}</li>
-              <li><strong>Número do documento:</strong> {{ result.documentNumber }}</li>
-              <li><strong>CPF:</strong> {{ result.cpf }}</li>
-              <li><strong>Data de nascimento:</strong> {{ result.dateOfBirth }}</li>
-              <li><strong>Local de nascimento:</strong> {{ result.placeOfBirth }}</li>
-              <li><strong>Nome do pai:</strong> {{ result.fatherName }}</li>
-              <li><strong>Nome da mãe:</strong> {{ result.motherName }}</li>
-              <li><strong>Gênero:</strong> {{ result.gender }}</li>
-              <li><strong>Nacionalidade:</strong> {{ result.nationality }}</li>
+              <li><strong>Nome:</strong> {{ result.identity.name }}</li>
+              <li><strong>Número do documento:</strong> {{ result.identity.documentNumber }}</li>
+              <li><strong>CPF:</strong> {{ result.identity.cpf }}</li>
+              <li><strong>Data de nascimento:</strong> {{ result.identity.dateOfBirth }}</li>
+              <li><strong>Local de nascimento:</strong> {{ result.identity.placeOfBirth }}</li>
+              <li><strong>Nome do pai:</strong> {{ result.identity.fatherName }}</li>
+              <li><strong>Nome da mãe:</strong> {{ result.identity.motherName }}</li>
+              <li><strong>Gênero:</strong> {{ result.identity.gender }}</li>
+              <li><strong>Nacionalidade:</strong> {{ result.identity.nationality }}</li>
             </ul>
             <p v-else>
               Imagem não é um documento de identificação
