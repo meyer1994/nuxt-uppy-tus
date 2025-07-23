@@ -20,11 +20,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
 
   nitro: {
-    preset: 'aws-lambda',
-    serveStatic: true,
-    inlineDynamicImports: true, // ideal for AWS lambda
     experimental: {
-      tasks: true,
       database: true,
     },
     storage: {
@@ -36,9 +32,6 @@ export default defineNuxtConfig({
         bucket: process.env.AWS_BUCKET || 'uploads',
         region: process.env.AWS_REGION || 'us-east-1',
       },
-    },
-    scheduledTasks: {
-      '* * * * *': ['files:process'],
     },
   },
 

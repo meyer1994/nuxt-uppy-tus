@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d2668ef9-85b5-424d-bfed-26bf44b0cfa5",
+  "id": "e126950f-6143-4b78-b364-25b056a19f08",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "files": {
@@ -28,22 +28,22 @@
           "notNull": true,
           "autoincrement": false
         },
-        "mime_type": {
-          "name": "mime_type",
+        "mimeType": {
+          "name": "mimeType",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "created_at": {
-          "name": "created_at",
+        "createdAt": {
+          "name": "createdAt",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "updated_at": {
-          "name": "updated_at",
+        "updatedAt": {
+          "name": "updatedAt",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,

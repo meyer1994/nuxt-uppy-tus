@@ -7,7 +7,7 @@ export default function useDrizzle() {
   return drizzle(db)
 }
 
+export { schema }
+
 export type FileSelect = typeof schema.files.$inferSelect
 export type FileInsert = typeof schema.files.$inferInsert
-
-export { schema }

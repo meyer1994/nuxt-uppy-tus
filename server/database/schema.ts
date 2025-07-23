@@ -7,12 +7,12 @@ export const files = sqliteTable('files', {
     .notNull(),
   path: text('path')
     .notNull(),
-  mimeType: text('mime_type')
+  mimeType: text('mimeType')
     .notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' })
+  createdAt: integer('createdAt', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' })
+  updatedAt: integer('updatedAt', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),
