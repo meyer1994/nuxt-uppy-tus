@@ -3,6 +3,7 @@ CREATE TABLE `files` (
 	`name` text NOT NULL,
 	`path` text NOT NULL,
 	`mimeType` text NOT NULL,
+	`documentType` text DEFAULT 'unknown' NOT NULL,
 	`createdAt` integer NOT NULL,
 	`updatedAt` integer NOT NULL
 );

@@ -9,6 +9,9 @@ export const files = sqliteTable('files', {
     .notNull(),
   mimeType: text('mimeType')
     .notNull(),
+  documentType: text('documentType')
+    .notNull()
+    .default('unknown'),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date()),

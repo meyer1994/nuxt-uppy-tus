@@ -38,7 +38,12 @@ const onDeleteFile = async (id: number) => {
       />
       <Column
         field="mimeType"
-        header="Type"
+        header="File Type"
+        sortable
+      />
+      <Column
+        field="documentType"
+        header="Document Type"
         sortable
       />
       <Column
