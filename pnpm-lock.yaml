@@ -41,6 +41,9 @@ importers:
       nuxt:
         specifier: ^3.17.7
         version: 3.17.7(@libsql/client@0.15.10)(@netlify/blobs@9.1.2)(@parcel/watcher@2.5.1)(@types/node@24.1.0)(@vue/compiler-sfc@3.5.18)(aws4fetch@1.0.20)(better-sqlite3@12.2.0)(db0@0.3.2(@libsql/client@0.15.10)(better-sqlite3@12.2.0)(drizzle-orm@0.44.3(@libsql/client@0.15.10)(@opentelemetry/api@1.9.0)(better-sqlite3@12.2.0)))(drizzle-orm@0.44.3(@libsql/client@0.15.10)(@opentelemetry/api@1.9.0)(better-sqlite3@12.2.0))(eslint@9.31.0(jiti@2.4.2))(ioredis@5.6.1)(lightningcss@1.30.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.45.1)(terser@5.43.1)(typescript@5.8.3)(vite@6.3.5(@types/node@24.1.0)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.43.1)(yaml@2.8.0))(vue-tsc@3.0.3(typescript@5.8.3))(xml2js@0.6.2)(yaml@2.8.0)
+      primeicons:
+        specifier: ^7.0.0
+        version: 7.0.0
       primevue:
         specifier: ^4.3.6
         version: 4.3.6(vue@3.5.18(typescript@5.8.3))
@@ -4642,6 +4645,9 @@ packages:
   pretty-bytes@6.1.1:
     resolution: {integrity: sha512-mQUvGU6aUFQ+rNvTIAcZuWGRT9a6f6Yrg9bHs4ImKF+HZCEK+plBvnAZYSIQztknZF2qnzNtr6F8s0+IuptdlQ==}
     engines: {node: ^14.13.1 || >=16.0.0}
+
+  primeicons@7.0.0:
+    resolution: {integrity: sha512-jK3Et9UzwzTsd6tzl2RmwrVY/b8raJ3QZLzoDACj+oTJ0oX7L9Hy+XnVwgo4QVKlKpnP/Ur13SXV/pVh4LzaDw==}
 
   primevue@4.3.6:
     resolution: {integrity: sha512-Wwg2dH6pBmOdkj9L/OnrCQf9AKPHfY5CcfnDyWeh0tNlR+XjYKGl8qvMdJOvGO9jjg6UdsX5MSaU8vDDsSG+sg==}
@@ -10981,6 +10987,8 @@ snapshots:
   prelude-ls@1.2.1: {}
 
   pretty-bytes@6.1.1: {}
+
+  primeicons@7.0.0: {}
 
   primevue@4.3.6(vue@3.5.18(typescript@5.8.3)):
     dependencies:

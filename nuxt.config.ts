@@ -11,6 +11,8 @@ export default defineNuxtConfig({
     },
   },
 
+  css: ['primeicons/primeicons.css'],
+
   runtimeConfig: {
     openai: {
       apiKey: process.env.OPENAI_API_KEY,
