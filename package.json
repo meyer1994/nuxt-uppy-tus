@@ -9,7 +9,8 @@
     "typecheck": "nuxt typecheck",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
     "@ai-sdk/openai": "2.0.0-beta.11",
@@ -29,6 +30,8 @@
     "@uppy/vue": "^2.3.0",
     "ai": "5.0.0-beta.25",
     "aws4fetch": "^1.0.20",
+    "db0": "^0.3.2",
+    "drizzle-orm": "^0.44.3",
     "nuxt": "^3.17.7",
     "primevue": "^4.3.6",
     "unstorage": "^1.16.1",
@@ -43,6 +46,7 @@
     "aws-cdk": "^2.1021.0",
     "aws-cdk-lib": "^2.206.0",
     "dotenv": "^17.2.0",
+    "drizzle-kit": "^0.31.4",
     "eslint": "^9.31.0",
     "typescript": "^5.8.3",
     "vue-tsc": "^3.0.3"
