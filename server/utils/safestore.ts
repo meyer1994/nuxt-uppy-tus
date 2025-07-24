@@ -23,34 +23,34 @@ export default () => {
     forcePathStyle: true,
   })
 
-  const fetch = async (key: string): Promise<FileSelect> => {
+  const fetch = async (id: string): Promise<FileSelect> => {
     const item = await db
       .select()
       .from(schema.files)
-      .where(eq(schema.files.key, key))
+      .where(eq(schema.files.id, id))
       .get()
 
-    if (!item) throw new Error(`File not found: ${key}`)
+    if (!item) throw new Error(`File not found: ${id}`)
 
     return item
   }
 
-  const update = async (key: string, meta: Record<string, string>): Promise<FileSelect> => {
+  const update = async (id: string, meta: Record<string, string>): Promise<FileSelect> => {
     const row = await db
       .update(schema.files)
       .set({ meta })
-      .where(eq(schema.files.key, key))
+      .where(eq(schema.files.id, id))
       .returning()
       .get()
 
-    if (!row) throw new Error(`File not found: ${key}`)
+    if (!row) throw new Error(`File not found: ${id}`)
 
     return row
   }
 
-  const exists = async (key: string): Promise<boolean> => {
+  const exists = async (id: string): Promise<boolean> => {
     try {
-      await get(key)
+      await get(id)
       return true
     }
     catch {
@@ -58,17 +58,17 @@ export default () => {
     }
   }
 
-  const get = async (key: string): Promise<ReadableStream> => {
-    await fetch(key) // errors if not found
+  const get = async (id: string): Promise<ReadableStream> => {
+    await fetch(id) // errors if not found
 
     const command = new GetObjectCommand({
       Bucket: BUCKET,
-      Key: key,
+      Key: id,
     })
 
     const response = await s3.send(command)
 
-    if (!response.Body) throw new Error(`Error fetching ${key} from S3`)
+    if (!response.Body) throw new Error(`Error fetching ${id} from S3`)
 
     return response.Body?.transformToWebStream()
   }
@@ -105,12 +105,18 @@ export default () => {
     return row
   }
 
-  const del = async (key: string): Promise<FileSelect> => {
-    const item = await fetch(key)
+  const del = async (id: string): Promise<FileSelect> => {
+    const item = await db
+      .delete(schema.files)
+      .where(eq(schema.files.id, id))
+      .returning()
+      .get()
+
+    if (!item) throw new Error(`File not found: ${id}`)
 
     const command = new DeleteObjectCommand({
       Bucket: BUCKET,
-      Key: key,
+      Key: item.key,
     })
 
     await s3.send(command)
@@ -118,18 +124,18 @@ export default () => {
     return item
   }
 
-  const url = async (key: string, opts?: { expiresIn?: number }): Promise<URL> => {
+  const url = async (id: string, opts?: { expiresIn?: number }): Promise<URL> => {
     const item = await db
       .select()
       .from(schema.files)
-      .where(eq(schema.files.key, key))
+      .where(eq(schema.files.key, id))
       .get()
 
-    if (!item) throw new Error(`File not found: ${key}`)
+    if (!item) throw new Error(`File not found: ${id}`)
 
     const command = new GetObjectCommand({
       Bucket: BUCKET,
-      Key: key,
+      Key: item.key,
     })
 
     const uri = await getSignedUrl(s3, command, { expiresIn: opts?.expiresIn || 3_600 })
