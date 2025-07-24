@@ -117,12 +117,12 @@ const doGet = async (id: string) => {
         field="file_name"
         header="Filename"
       >
-        <template #body="{ data: { file_name } }">
+        <template #body="{ data: { key } }">
           <span
             class="text-sm font-mono"
-            :title="file_name"
+            :title="key"
           >
-            {{ file_name.length > 11 ? file_name.slice(0, 14) + '...' : file_name }}
+            {{ key.length > 11 ? key.slice(0, 14) + '...' : key }}
           </span>
         </template>
       </Column>
@@ -138,13 +138,12 @@ const doGet = async (id: string) => {
           <NuxtTime
             relative
             title
-            locale="pt-BR"
-            :datetime="new Date(created_at)"
+            :datetime="created_at"
           />
         </template>
       </Column>
       <Column>
-        <template #body="{ data: { id } }">
+        <template #body="{ data: { id, url } }">
           <Button
             icon="pi pi-trash"
             severity="danger"
@@ -156,6 +155,15 @@ const doGet = async (id: string) => {
             severity="secondary"
             size="small"
             @click="() => doGet(id)"
+          />
+          <Button
+            icon="pi pi-download"
+            severity="info"
+            size="small"
+            as="a"
+            :href="`${url}`"
+            target="_blank"
+            title="Download file"
           />
         </template>
       </Column>

@@ -1,6 +1,5 @@
-import { eq } from 'drizzle-orm'
 import z from 'zod'
-import useDrizzle from '~/server/utils/drizzle'
+import useSafestore from '~/server/utils/safestore'
 
 const zSchema = z.object({
   id: z.string().uuid(),
@@ -8,18 +7,6 @@ const zSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, e => zSchema.parse(e))
-
-  const db = useDrizzle()
-  const storage = useStorage('s3')
-
-  const file = await db
-    .delete(schema.files)
-    .where(eq(schema.files.id, id))
-    .returning()
-    .get()
-  if (!file) throw createError({ statusCode: 404 })
-
-  await storage.removeItem(file.key)
-
-  return { file }
+  const storage = useSafestore()
+  return { file: await storage.del(id) }
 })
