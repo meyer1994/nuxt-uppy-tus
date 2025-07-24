@@ -161,7 +161,7 @@ const doGet = async (id: string) => {
             severity="info"
             size="small"
             as="a"
-            :href="`${url}`"
+            :href="`/api/files/${id}/download`"
             target="_blank"
             title="Download file"
           />

@@ -128,7 +128,7 @@ export default () => {
     const item = await db
       .select()
       .from(schema.files)
-      .where(eq(schema.files.key, id))
+      .where(eq(schema.files.id, id))
       .get()
 
     if (!item) throw new Error(`File not found: ${id}`)
