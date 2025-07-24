@@ -1,4 +1,18 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3000
+
   minio:
     image: minio/minio
     ports:
@@ -18,11 +32,6 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - 5432:5432
-
-  redis:
-    image: redis:alpine
-    ports:
-      - 6379:6379
 
   cloudflared:
     image: cloudflare/cloudflared

@@ -2,7 +2,7 @@ import Material from '@primeuix/themes/material'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', '@primevue/nuxt-module', '@nuxtjs/tailwindcss'],
+  modules: ['@nuxt/eslint', '@primevue/nuxt-module', '@nuxtjs/tailwindcss', '@vueuse/nuxt'],
 
   devtools: {
     enabled: true,
@@ -15,6 +15,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     openai: {
+      model: 'gpt-4o-mini',
       apiKey: process.env.OPENAI_API_KEY,
     },
   },
@@ -42,6 +43,12 @@ export default defineNuxtConfig({
         bucket: process.env.AWS_BUCKET,
         region: process.env.AWS_REGION,
       },
+    },
+  },
+
+  vite: {
+    server: {
+      allowedHosts: ['localhost', '127.0.0.1', '0.0.0.0', 'free-loudly-dingo.ngrok-free.app'],
     },
   },
 

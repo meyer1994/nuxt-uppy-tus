@@ -1,13 +1,11 @@
-import { openai } from '@ai-sdk/openai'
-import type { SystemModelMessage, UserModelMessage } from 'ai'
-import { generateObject } from 'ai'
-import { z } from 'zod'
+import { zodTextFormat } from 'openai/helpers/zod'
+import type { ResponseInputItem } from 'openai/resources/responses/responses.mjs'
+import type { z } from 'zod'
+import * as PROMPTS from './ai/prompts'
+import * as SCHEMAS from './ai/schemas'
+import { useOpenAI } from './useOpenAI'
 
-interface AiOptions {
-  model?: string
-}
-
-export enum FileTypes {
+export enum AIDocumentTypes {
   RG = 'RG',
   CPF = 'CPF',
   CNH = 'CNH',
@@ -16,297 +14,93 @@ export enum FileTypes {
   DESCONHECIDO = 'DESCONHECIDO',
 }
 
-export type SupportedMimeTypes = 'application/pdf' | 'image/jpg' | 'image/png' | 'image/jpeg'
+type RGType = z.infer<typeof SCHEMAS.RG_SCHEMA> & { type: AIDocumentTypes.RG }
+type CPFType = z.infer<typeof SCHEMAS.CPF_SCHEMA> & { type: AIDocumentTypes.CPF }
+type CNHType = z.infer<typeof SCHEMAS.CNH_SCHEMA> & { type: AIDocumentTypes.CNH }
+type CNPJType = z.infer<typeof SCHEMAS.CNPJ_SCHEMA> & { type: AIDocumentTypes.CNPJ }
+type CERTIDAOType = z.infer<typeof SCHEMAS.CERTIDAO_SCHEMA> & { type: AIDocumentTypes.CERTIDAO }
+type DESCONHECIDOType = { type: AIDocumentTypes.DESCONHECIDO }
 
-// Zod schemas for each document type
-const RG_SCHEMA = z.object({
-  nome_completo: z.string().nullable(),
-  data_nascimento: z.string().nullable(),
-  numero_rg: z.string().nullable(),
-  orgao_emissor: z.string().nullable(),
-  data_emissao: z.string().nullable(),
-  local_nascimento: z.string().nullable(),
-  pai: z.string().nullable(),
-  mae: z.string().nullable(),
-  naturalidade: z.string().nullable(),
-  uf: z.string().nullable(),
-})
+export type AIInfoTypes = RGType | CPFType | CNHType | CNPJType | CERTIDAOType | DESCONHECIDOType
+export type AIMimeTypes = 'application/pdf' | 'image/jpg' | 'image/png' | 'image/jpeg'
 
-const CPF_SCHEMA = z.object({
-  numero_cpf: z.string().nullable(),
-  nome_completo: z.string().nullable(),
-  data_nascimento: z.string().nullable(),
-  situacao_cadastral: z.string().nullable(),
-  data_inscricao: z.string().nullable(),
-  orgao_emissor: z.string().nullable(),
-})
+const buildMessage = (url: URL, mime: AIMimeTypes): ResponseInputItem.Message => {
+  switch (mime) {
+    case 'application/pdf':
+      return {
+        role: 'user',
+        content: [{ type: 'input_file', file_url: url.toString() }],
+      }
 
-const CNH_SCHEMA = z.object({
-  nome_completo: z.string().nullable(),
-  data_nascimento: z.string().nullable(),
-  numero_registro: z.string().nullable(),
-  categoria: z.string().nullable(),
-  data_emissao: z.string().nullable(),
-  data_validade: z.string().nullable(),
-  orgao_emissor: z.string().nullable(),
-  local_emissao: z.string().nullable(),
-  cpf: z.string().nullable(),
-  rg: z.string().nullable(),
-  uf: z.string().nullable(),
-})
+    case 'image/png':
+    case 'image/jpg':
+    case 'image/jpeg':
+      return {
+        role: 'user',
+        content: [{ type: 'input_image', image_url: url.toString(), detail: 'high' }],
+      }
 
-const CNPJ_SCHEMA = z.object({
-  numero_cnpj: z.string().nullable(),
-  razao_social: z.string().nullable(),
-  nome_fantasia: z.string().nullable(),
-  data_abertura: z.string().nullable(),
-  endereco: z.string().nullable(),
-  cep: z.string().nullable(),
-  municipio: z.string().nullable(),
-  uf: z.string().nullable(),
-  telefone: z.string().nullable(),
-  email: z.string().nullable(),
-  situacao_cadastral: z.string().nullable(),
-  tipo_empresa: z.string().nullable(),
-  atividade_economica: z.string().nullable(),
-})
-
-const CERTIDAO_SCHEMA = z.object({
-  nome_comprador: z.string().nullable(),
-  nome_vendedor: z.string().nullable(),
-  data_compra_venda: z.string().nullable(),
-  valor_transacao: z.string().nullable(),
-  endereco_imovel: z.string().nullable(),
-  area_imovel: z.string().nullable(),
-  matricula_imovel: z.string().nullable(),
-  cartorio_registro: z.string().nullable(),
-  data_certidao: z.string().nullable(),
-  numero_certidao: z.string().nullable(),
-  municipio: z.string().nullable(),
-  uf: z.string().nullable(),
-})
-
-export type RGType = z.infer<typeof RG_SCHEMA> & { type: FileTypes.RG }
-export type CPFType = z.infer<typeof CPF_SCHEMA> & { type: FileTypes.CPF }
-export type CNHType = z.infer<typeof CNH_SCHEMA> & { type: FileTypes.CNH }
-export type CNPJType = z.infer<typeof CNPJ_SCHEMA> & { type: FileTypes.CNPJ }
-export type CERTIDAOType = z.infer<typeof CERTIDAO_SCHEMA> & { type: FileTypes.CERTIDAO }
-export type DESCONHECIDOType = { type: FileTypes.DESCONHECIDO }
-
-export type InfoType = RGType | CPFType | CNHType | CNPJType | CERTIDAOType | DESCONHECIDOType
-
-// Information extraction prompts
-const PROMPT_EXTRACT_RG = `
-Você é um especialista em extrair informações de documentos brasileiros. Analise o RG fornecido e extraia as seguintes informações em formato JSON:
-
-{
-  "nome_completo": "Nome completo do portador",
-  "data_nascimento": "Data de nascimento (DD/MM/AAAA)",
-  "numero_rg": "Número do RG",
-  "orgao_emissor": "Órgão emissor (SSP, DETRAN, etc.)",
-  "data_emissao": "Data de emissão (DD/MM/AAAA)",
-  "local_nascimento": "Local de nascimento",
-  "pai": "Nome do pai",
-  "mae": "Nome da mãe",
-  "naturalidade": "Naturalidade",
-  "uf": "Estado de emissão"
-}
-
-Extraia apenas as informações que estão visíveis no documento. Se alguma informação não estiver presente, use null.
-`
-
-const PROMPT_EXTRACT_CPF = `
-Você é um especialista em extrair informações de documentos brasileiros. Analise o CPF fornecido e extraia as seguintes informações em formato JSON:
-
-{
-  "numero_cpf": "Número do CPF (apenas números)",
-  "nome_completo": "Nome completo do titular",
-  "data_nascimento": "Data de nascimento (DD/MM/AAAA)",
-  "situacao_cadastral": "Situação cadastral (Regular, Pendente, etc.)",
-  "data_inscricao": "Data de inscrição (DD/MM/AAAA)",
-  "orgao_emissor": "Órgão emissor (Receita Federal)"
-}
-
-Extraia apenas as informações que estão visíveis no documento. Se alguma informação não estiver presente, use null.
-`
-
-const PROMPT_EXTRACT_CNH = `
-Você é um especialista em extrair informações de documentos brasileiros. Analise a CNH fornecida e extraia as seguintes informações em formato JSON:
-
-{
-  "nome_completo": "Nome completo do condutor",
-  "data_nascimento": "Data de nascimento (DD/MM/AAAA)",
-  "numero_registro": "Número de registro da CNH",
-  "categoria": "Categoria de habilitação (A, B, C, D, E, AB, AC, AD, AE)",
-  "data_emissao": "Data de emissão (DD/MM/AAAA)",
-  "data_validade": "Data de validade (DD/MM/AAAA)",
-  "orgao_emissor": "Órgão emissor (DETRAN)",
-  "local_emissao": "Local de emissão",
-  "cpf": "CPF do condutor",
-  "rg": "RG do condutor",
-  "uf": "Estado de emissão"
-}
-
-Extraia apenas as informações que estão visíveis no documento. Se alguma informação não estiver presente, use null.
-`
-
-const PROMPT_EXTRACT_CNPJ = `
-Você é um especialista em extrair informações de documentos brasileiros. Analise o CNPJ fornecido e extraia as seguintes informações em formato JSON:
-
-{
-  "numero_cnpj": "Número do CNPJ (apenas números)",
-  "razao_social": "Razão social da empresa",
-  "nome_fantasia": "Nome fantasia (se houver)",
-  "data_abertura": "Data de abertura (DD/MM/AAAA)",
-  "endereco": "Endereço completo",
-  "cep": "CEP",
-  "municipio": "Município",
-  "uf": "Estado",
-  "telefone": "Telefone",
-  "email": "Email",
-  "situacao_cadastral": "Situação cadastral (Ativa, Suspensa, etc.)",
-  "tipo_empresa": "Tipo de empresa (LTDA, ME, EIRELI, etc.)",
-  "atividade_economica": "Atividade econômica"
-}
-
-Extraia apenas as informações que estão visíveis no documento. Se alguma informação não estiver presente, use null.
-`
-
-const PROMPT_EXTRACT_CERTIDAO = `
-Você é um especialista em extrair informações de documentos brasileiros. Analise a CERTIDÃO fornecida e extraia as seguintes informações em formato JSON:
-
-{
-  "nome_comprador": "Nome completo do comprador",
-  "nome_vendedor": "Nome completo do vendedor",
-  "data_compra_venda": "Data da compra e venda (DD/MM/AAAA)",
-  "valor_transacao": "Valor da transação",
-  "endereco_imovel": "Endereço completo do imóvel",
-  "area_imovel": "Área do imóvel",
-  "matricula_imovel": "Matrícula do imóvel",
-  "cartorio_registro": "Cartório de registro",
-  "data_certidao": "Data da certidão (DD/MM/AAAA)",
-  "numero_certidao": "Número da certidão",
-  "municipio": "Município",
-  "uf": "Estado"
-}
-
-Extraia apenas as informações que estão visíveis no documento. Se alguma informação não estiver presente, use null.
-`
-
-// Information extraction prompts mapping
-const INFORMATION_EXTRACTION_PROMPTS: Record<Exclude<FileTypes, FileTypes.DESCONHECIDO>, string> = {
-  [FileTypes.RG]: PROMPT_EXTRACT_RG,
-  [FileTypes.CPF]: PROMPT_EXTRACT_CPF,
-  [FileTypes.CNH]: PROMPT_EXTRACT_CNH,
-  [FileTypes.CNPJ]: PROMPT_EXTRACT_CNPJ,
-  [FileTypes.CERTIDAO]: PROMPT_EXTRACT_CERTIDAO,
-} as const
-
-// Schema mapping
-const SCHEMA_MAPPING: Record<Exclude<FileTypes, FileTypes.DESCONHECIDO>, z.ZodSchema> = {
-  [FileTypes.RG]: RG_SCHEMA,
-  [FileTypes.CPF]: CPF_SCHEMA,
-  [FileTypes.CNH]: CNH_SCHEMA,
-  [FileTypes.CNPJ]: CNPJ_SCHEMA,
-  [FileTypes.CERTIDAO]: CERTIDAO_SCHEMA,
-} as const
-
-export const useAi = (opts: AiOptions = {}) => {
-  const model = openai(opts.model || 'gpt-4o-mini')
-
-  const _toUrl = async (url: URL, mimeType: SupportedMimeTypes) => {
-    const data = await $fetch<Blob>(url.toString(), { responseType: 'blob' })
-    if (!data) throw new Error('Failed to fetch data')
-
-    const arrayBuffer = await data.arrayBuffer()
-    const base64 = Buffer.from(arrayBuffer).toString('base64')
-    const mediaUrl = `data:${mimeType};base64,${base64}`
-    console.info('mediaUrl', mediaUrl.slice(0, 64))
-
-    return mediaUrl
+    default:
+      throw new Error(`Unsupported mime type: ${mime}`)
   }
+}
 
-  const _message = (mimeType: SupportedMimeTypes, mediaUrl: string): UserModelMessage => {
-    switch (mimeType) {
-      case 'application/pdf':
-        return {
-          role: 'user',
-          content: [{
-            type: 'file',
-            data: mediaUrl,
-            mediaType: mimeType,
-          }],
-        }
-      case 'image/jpg':
-      case 'image/jpeg':
-      case 'image/png':
-        return {
-          role: 'user',
-          content: [{
-            type: 'image',
-            image: mediaUrl,
-            mediaType: mimeType,
-          }],
-        }
-      default:
-        throw new Error(`Unsupported mime type: ${mimeType}`)
-    }
-  }
+const buildPrompt = (type: AIDocumentTypes) => {
+  if (type === AIDocumentTypes.RG) return PROMPTS.PROMPT_EXTRACT_RG
+  if (type === AIDocumentTypes.CPF) return PROMPTS.PROMPT_EXTRACT_CPF
+  if (type === AIDocumentTypes.CNH) return PROMPTS.PROMPT_EXTRACT_CNH
+  if (type === AIDocumentTypes.CNPJ) return PROMPTS.PROMPT_EXTRACT_CNPJ
+  if (type === AIDocumentTypes.CERTIDAO) return PROMPTS.PROMPT_EXTRACT_CERTIDAO
+  throw new Error(`Unsupported document type: ${type}`)
+}
 
-  const type = async (url: URL, mimeType: SupportedMimeTypes) => {
-    const mediaUrl = await _toUrl(url, mimeType)
+const buildSchema = (type: AIDocumentTypes) => {
+  if (type === AIDocumentTypes.RG) return SCHEMAS.RG_SCHEMA
+  if (type === AIDocumentTypes.CPF) return SCHEMAS.CPF_SCHEMA
+  if (type === AIDocumentTypes.CNH) return SCHEMAS.CNH_SCHEMA
+  if (type === AIDocumentTypes.CNPJ) return SCHEMAS.CNPJ_SCHEMA
+  if (type === AIDocumentTypes.CERTIDAO) return SCHEMAS.CERTIDAO_SCHEMA
+  throw new Error(`Unsupported document type: ${type}`)
+}
 
-    const messages: Array<SystemModelMessage | UserModelMessage> = [
-      {
-        role: 'system',
-        content: `
-        Você é um assistente útil que pode determinar o tipo de um documento brasileiro a partir do arquivo enviado.
+export const useAi = () => {
+  const config = useRuntimeConfig()
+  const openai = useOpenAI()
 
-        Os tipos de documento possíveis são:
-        - RG: Registro Geral, documento de identidade brasileiro, normalmente contém nome completo, data de nascimento, filiação, número do RG, órgão emissor e foto.
-        - CPF: Cadastro de Pessoas Físicas, documento fiscal brasileiro, geralmente apresenta apenas o número do CPF, nome completo e data de nascimento.
-        - CNH: Carteira Nacional de Habilitação, documento de habilitação para dirigir, inclui foto, número de registro, categoria, validade, nome completo e data de nascimento.
-        - CNPJ: Cadastro Nacional da Pessoa Jurídica, documento de identificação de empresas, normalmente apresenta razão social, número do CNPJ, endereço e data de abertura.
-        - CERTIDAO: Certidão de compra e venda de imóvel, documento de identificação de imóvel, normalmente apresenta nome do comprador, nome do vendedor, data da compra e venda, valor da compra e venda, endereço do imóvel e data da certidão.
+  const type = async (url: URL, mimeType: AIMimeTypes) => {
+    const message = buildMessage(url, mimeType)
 
-        Se não tiver certeza, retorne 'DESCONHECIDO'.
-
-        ALWAYS RETURN A RESPONSE.
-        `,
-      },
-      _message(mimeType, mediaUrl),
-    ]
-
-    const { object } = await generateObject({
-      model,
-      messages,
-      output: 'enum',
-      enum: Object.values(FileTypes),
+    const response = await openai.responses.parse({
+      model: config.openai.model,
+      text: { format: zodTextFormat(SCHEMAS.FILE_TYPE_SCHEMA, 'type') },
+      input: [
+        { role: 'system', content: PROMPTS.PROMPT_SYSTEM_TYPE_DOCUMENT },
+        message,
+      ],
     })
 
-    return { type: object }
+    if (!response.output_parsed) throw new Error('No output parsed')
+    return response.output_parsed.type
   }
 
-  const info = async (url: URL, mimeType: SupportedMimeTypes, type: FileTypes) => {
-    if (type === FileTypes.DESCONHECIDO) return {}
+  const info = async (url: URL, mime: AIMimeTypes, type: AIDocumentTypes): Promise<AIInfoTypes> => {
+    if (type === AIDocumentTypes.DESCONHECIDO) return { type }
 
-    const mediaUrl = await _toUrl(url, mimeType)
+    const schema = buildSchema(type)
+    const prompt = buildPrompt(type)
+    const message = buildMessage(url, mime)
 
-    const messages: Array<SystemModelMessage | UserModelMessage> = [
-      {
-        role: 'system',
-        content: INFORMATION_EXTRACTION_PROMPTS[type],
-      },
-      _message(mimeType, mediaUrl),
-    ]
-
-    const { object } = await generateObject({
-      model,
-      messages,
-      schema: SCHEMA_MAPPING[type],
+    const response = await openai.responses.parse({
+      model: config.openai.model,
+      text: { format: zodTextFormat(schema, 'info') },
+      input: [
+        { role: 'system', content: prompt },
+        message,
+      ],
     })
 
-    return object
+    if (!response.output_parsed) throw new Error('No output parsed')
+    return { ...response.output_parsed, type } as AIInfoTypes
   }
 
   return { type, info }

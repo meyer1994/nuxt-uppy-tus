@@ -1,5 +1,6 @@
 import { jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import { FileTypes } from '../utils/useAi'
+import type { AIInfoTypes } from '../utils/useAi'
+import { AIDocumentTypes } from '../utils/useAi'
 
 export const files = pgTable('files', {
   id: uuid('id')
@@ -13,8 +14,8 @@ export const files = pgTable('files', {
     .notNull(),
   info: jsonb('info')
     .notNull()
-    .$type<InfoType>()
-    .$defaultFn(() => ({ type: FileTypes.DESCONHECIDO })),
+    .$type<AIInfoTypes>()
+    .$defaultFn(() => ({ type: AIDocumentTypes.DESCONHECIDO })),
   createdAt: timestamp('created_at', { withTimezone: false })
     .notNull()
     .$defaultFn(() => new Date()),

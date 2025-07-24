@@ -8,7 +8,7 @@ export const useS3 = () => {
       accessKeyId: 'minioadmin',
       secretAccessKey: 'minioadmin',
     },
-    endpoint: 'http://dev.jmeyer.dev',
+    endpoint: 'https://dev.jmeyer.dev',
     forcePathStyle: true,
   })
 

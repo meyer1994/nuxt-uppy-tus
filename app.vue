@@ -1,9 +1,20 @@
 <script setup lang="ts">
-const { data, refresh } = useFetch('/api/files', { default: () => ({ files: [] }) })
+import type { FileSelect } from './server/utils/drizzle'
 
-const onDeleteFile = async (id: number) => {
+const { data, refresh, status } = useFetch('/api/files', { default: () => ({ files: [] }) })
+useIntervalFn(refresh, 3_000)
+
+const open = ref(false)
+const file = ref<FileSelect | null>(null)
+
+const onDeleteFile = async (id: string) => {
   await $fetch('/api/files', { method: 'DELETE', body: { id } })
   await refresh()
+}
+
+const onDialogOpen = async (e: FileSelect) => {
+  file.value = e
+  open.value = true
 }
 </script>
 
@@ -13,7 +24,9 @@ const onDeleteFile = async (id: number) => {
       <FileUpload
         url="/api/files"
         :auto="true"
+        :multiple="true"
         mode="basic"
+        accept="image/jpeg,image/png,image/jpg,application/pdf"
         @upload="() => refresh()"
       />
       <Button
@@ -21,14 +34,20 @@ const onDeleteFile = async (id: number) => {
         @click="() => refresh()"
       />
     </div>
-    <DataTable :value="data.files">
+
+    <DataTable
+      :value="data.files"
+      :loading="status === 'pending'"
+    >
       <Column
         field="id"
         header="ID"
         sortable
       >
         <template #body="{ data: { id } }">
-          # <span class="hover:underline cursor-pointer">{{ id.slice(0, 8) }}</span>
+          <div class="text-sm font-mono">
+            #<span class="hover:underline cursor-pointer">{{ id.slice(0, 8) }}</span>
+          </div>
         </template>
       </Column>
       <Column
@@ -50,6 +69,7 @@ const onDeleteFile = async (id: number) => {
           <NuxtTime
             relative
             title
+            locale="pt-BR"
             :datetime="new Date(created_at)"
           />
         </template>
@@ -58,15 +78,32 @@ const onDeleteFile = async (id: number) => {
         field="actions"
         header="Actions"
       >
-        <template #body="{ data: { id } }">
-          <Button
-            severity="danger"
-            icon="pi pi-trash"
-            size="small"
-            @click="() => onDeleteFile(id)"
-          />
+        <template #body="{ data: cellFile }">
+          <div class="flex gap-2">
+            <Button
+              severity="danger"
+              icon="pi pi-trash"
+              size="small"
+              @click="() => onDeleteFile(cellFile.id)"
+            />
+            <Button
+              severity="info"
+              icon="pi pi-search"
+              size="small"
+              @click="() => onDialogOpen(cellFile)"
+            />
+          </div>
         </template>
       </Column>
     </DataTable>
+
+    <Dialog
+      v-model:visible="open"
+      :modal="true"
+      :header="file?.name"
+      :draggable="false"
+    >
+      <pre>{{ file }}</pre>
+    </Dialog>
   </main>
 </template>

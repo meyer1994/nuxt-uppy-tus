@@ -7,14 +7,14 @@ export default defineEventHandler(async (event) => {
   const form = await readMultipartFormData(event)
   if (!form) throw createError({ statusCode: 400 })
 
-  const ai = useAi()
   const s3 = useS3()
+  const ai = useAi()
   const db = useDrizzle()
   const storage = useStorage('s3')
 
   const files = await Promise.all(form.map(async (file) => {
     const filename = file.filename || 'unknown'
-    const mimeType = file.type as SupportedMimeTypes
+    const mimeType = file.type as AIMimeTypes
 
     console.info(`Uploading ${filename}, ${mimeType}, ${file.data.length} bytes`)
     await storage.setItemRaw(filename, file.data, { mimeType: mimeType })
@@ -28,22 +28,21 @@ export default defineEventHandler(async (event) => {
       .returning()
     console.debug(row.id)
 
-    console.info(`Extracting type ${filename}, ${mimeType}`)
+    console.info(`Extracting info from ${filename}, ${mimeType}`)
     const type = await ai.type(url, mimeType)
-    console.debug(type.type)
-
-    console.info(`Extracting info ${filename}, ${type.type}`)
-    const info = await ai.info(url, mimeType, type.type)
+    const info = await ai.info(url, mimeType, type)
     console.debug(info)
 
-    console.info(`Updating document type ${filename}, ${type.type}`)
-    await db
+    console.info(`Updating db ${filename}, ${mimeType}`)
+    const [nRow] = await db
       .update(schema.files)
-      .set({ ...info, type: type.type })
+      .set({ info })
       .where(eq(schema.files.id, row.id))
+      .returning()
+    console.debug(nRow)
 
-    return row
+    return nRow
   }))
 
-  return { files }
+  return { files: files.filter(i => i !== null) }
 })
