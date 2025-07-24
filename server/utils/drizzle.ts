@@ -9,5 +9,8 @@ export default function useDrizzle() {
 
 export { schema }
 
+type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue }
+type Item = Record<string, JSONValue>
+
 export type FileSelect = typeof schema.files.$inferSelect
-export type FileInsert = typeof schema.files.$inferInsert
+export type FileInsert = Omit<typeof schema.files.$inferInsert, 'meta'> & { meta?: Item }

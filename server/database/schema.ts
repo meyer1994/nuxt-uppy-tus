@@ -1,25 +1,27 @@
-import { jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import type { AIInfoTypes } from '../utils/useAi'
-import { AIDocumentTypes } from '../utils/useAi'
+import { sql } from 'drizzle-orm'
+import { bigint, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
 export const files = pgTable('files', {
   id: uuid('id')
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  name: text('name')
+  file_name: text('file_name')
     .notNull(),
-  path: text('path')
+  key: text('key')
     .notNull(),
-  mimeType: text('mime_type')
-    .notNull(),
-  info: jsonb('info')
+  mime_type: text('mime_type')
     .notNull()
-    .$type<AIInfoTypes>()
-    .$defaultFn(() => ({ type: AIDocumentTypes.DESCONHECIDO })),
-  createdAt: timestamp('created_at', { withTimezone: false })
+    .default(sql`'application/octet-stream'`),
+  size_bytes: bigint('size_bytes', { mode: 'number' })
+    .notNull()
+    .default(-1),
+  meta: jsonb('meta')
+    .notNull()
+    .default(sql`'{}'`),
+  created_at: timestamp('created_at', { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: timestamp('updated_at', { withTimezone: false })
+  updated_at: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),
