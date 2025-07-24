@@ -1,21 +1,24 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { FileTypes } from '../utils/useAi'
 
-export const files = sqliteTable('files', {
-  id: integer('id')
-    .primaryKey({ autoIncrement: true }),
+export const files = pgTable('files', {
+  id: uuid('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   name: text('name')
     .notNull(),
   path: text('path')
     .notNull(),
-  mimeType: text('mimeType')
+  mimeType: text('mime_type')
     .notNull(),
-  documentType: text('documentType')
+  info: jsonb('info')
     .notNull()
-    .default('unknown'),
-  createdAt: integer('createdAt', { mode: 'timestamp_ms' })
+    .$type<InfoType>()
+    .$defaultFn(() => ({ type: FileTypes.DESCONHECIDO })),
+  createdAt: timestamp('created_at', { withTimezone: false })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: integer('updatedAt', { mode: 'timestamp_ms' })
+  updatedAt: timestamp('updated_at', { withTimezone: false })
     .notNull()
     .$defaultFn(() => new Date())
     .$onUpdate(() => new Date()),

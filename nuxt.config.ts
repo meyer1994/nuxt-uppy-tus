@@ -25,14 +25,22 @@ export default defineNuxtConfig({
     experimental: {
       database: true,
     },
+    database: {
+      default: {
+        connector: 'postgresql',
+        options: {
+          url: process.env.DATABASE_URL,
+        },
+      },
+    },
     storage: {
       s3: {
         driver: 's3',
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'minioadmin',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'minioadmin',
-        endpoint: process.env.AWS_ENDPOINT || 'http://localhost:9000',
-        bucket: process.env.AWS_BUCKET || 'uploads',
-        region: process.env.AWS_REGION || 'us-east-1',
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        endpoint: process.env.AWS_ENDPOINT,
+        bucket: process.env.AWS_BUCKET,
+        region: process.env.AWS_REGION,
       },
     },
   },

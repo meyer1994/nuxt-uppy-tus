@@ -1,6 +1,6 @@
 services:
   minio:
-    image: minio/minio:latest
+    image: minio/minio
     ports:
       - 9000:9000
       - 9001:9001
@@ -9,11 +9,23 @@ services:
       MINIO_ROOT_PASSWORD: minioadmin
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
-    command: minio server /data --console-address ':9001'
-    volumes:
-      - .data/minio:/data
+    # so it creates the uploads bucket on start
+    entrypoint: ["/bin/sh", "-c", "mkdir -p /data/uploads && minio server /data --console-address ':9001'"]
+
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared
     env_file:
       - .env
     ports:

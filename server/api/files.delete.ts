@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm'
 import z from 'zod'
-import useDrizzle, { schema } from '~/server/utils/drizzle'
+import useDrizzle from '~/server/utils/drizzle'
 
 const zSchema = z.object({
-  id: z.number().int().positive(),
+  id: z.string().uuid(),
 })
 
 export default defineEventHandler(async (event) => {

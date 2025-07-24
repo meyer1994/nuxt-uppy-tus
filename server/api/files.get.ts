@@ -1,5 +1,5 @@
 import { desc } from 'drizzle-orm'
-import useDrizzle, { schema } from '~/server/utils/drizzle'
+import useDrizzle from '~/server/utils/drizzle'
 
 export default defineEventHandler(async () => {
   const db = useDrizzle()

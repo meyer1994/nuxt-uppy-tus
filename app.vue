@@ -28,7 +28,7 @@ const onDeleteFile = async (id: number) => {
         sortable
       >
         <template #body="{ data: { id } }">
-          #<span class="hover:underline cursor-pointer">{{ id }}</span>
+          # <span class="hover:underline cursor-pointer">{{ id.slice(0, 8) }}</span>
         </template>
       </Column>
       <Column
@@ -37,25 +37,20 @@ const onDeleteFile = async (id: number) => {
         sortable
       />
       <Column
-        field="mimeType"
-        header="File Type"
-        sortable
-      />
-      <Column
-        field="documentType"
+        field="info.type"
         header="Document Type"
         sortable
       />
       <Column
-        field="createdAt"
+        field="created_at"
         header="Created At"
         sortable
       >
-        <template #body="{ data: { createdAt } }">
+        <template #body="{ data: { created_at } }">
           <NuxtTime
             relative
             title
-            :datetime="new Date(createdAt)"
+            :datetime="new Date(created_at)"
           />
         </template>
       </Column>

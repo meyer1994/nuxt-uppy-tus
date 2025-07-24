@@ -7,7 +7,7 @@ interface AiOptions {
   model?: string
 }
 
-enum FileTypes {
+export enum FileTypes {
   RG = 'RG',
   CPF = 'CPF',
   CNH = 'CNH',
@@ -85,6 +85,15 @@ const CERTIDAO_SCHEMA = z.object({
   municipio: z.string().nullable(),
   uf: z.string().nullable(),
 })
+
+export type RGType = z.infer<typeof RG_SCHEMA> & { type: FileTypes.RG }
+export type CPFType = z.infer<typeof CPF_SCHEMA> & { type: FileTypes.CPF }
+export type CNHType = z.infer<typeof CNH_SCHEMA> & { type: FileTypes.CNH }
+export type CNPJType = z.infer<typeof CNPJ_SCHEMA> & { type: FileTypes.CNPJ }
+export type CERTIDAOType = z.infer<typeof CERTIDAO_SCHEMA> & { type: FileTypes.CERTIDAO }
+export type DESCONHECIDOType = { type: FileTypes.DESCONHECIDO }
+
+export type InfoType = RGType | CPFType | CNHType | CNPJType | CERTIDAOType | DESCONHECIDOType
 
 // Information extraction prompts
 const PROMPT_EXTRACT_RG = `
@@ -245,8 +254,6 @@ export const useAi = (opts: AiOptions = {}) => {
   }
 
   const type = async (url: URL, mimeType: SupportedMimeTypes) => {
-    console.info('type', url.toString(), mimeType)
-
     const mediaUrl = await _toUrl(url, mimeType)
 
     const messages: Array<SystemModelMessage | UserModelMessage> = [
@@ -281,7 +288,6 @@ export const useAi = (opts: AiOptions = {}) => {
   }
 
   const info = async (url: URL, mimeType: SupportedMimeTypes, type: FileTypes) => {
-    console.info('info', url.toString(), mimeType, type)
     if (type === FileTypes.DESCONHECIDO) return {}
 
     const mediaUrl = await _toUrl(url, mimeType)
