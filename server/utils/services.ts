@@ -1,3 +1,5 @@
+import { S3Store } from '@tus/s3-store'
+import { Server } from '@tus/server'
 import Stripe from 'stripe'
 
 let stripe: Stripe | null = null
@@ -8,4 +10,31 @@ const useStripe = (): Stripe => {
   return stripe
 }
 
-export { useStripe }
+let tus: Server | null = null
+const useTus = () => {
+  if (tus) return tus
+
+  console.info('Creating TUS server')
+  tus = new Server(
+    {
+      path: '/api/tus',
+      datastore: new S3Store({
+        partSize: 8 * 1024 * 1024, // Each uploaded part will have ~8MiB,
+        s3ClientConfig: {
+          bucket: 'uploads',
+          region: 'us-east-1',
+          credentials: {
+            accessKeyId: 'minioadmin',
+            secretAccessKey: 'minioadmin',
+          },
+          endpoint: 'http://localhost:9000',
+          forcePathStyle: true,
+        },
+      }),
+    },
+  )
+
+  return tus
+}
+
+export { useStripe, useTus }

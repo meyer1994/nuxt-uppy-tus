@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
-    'nuxt-webhook-validators',
+    '@nuxt/image',
   ],
 
   devtools: {

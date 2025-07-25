@@ -4,7 +4,7 @@ import * as schema from '~/server/database/schema'
 
 export default () => {
   const db = useDatabase()
-  return drizzle(db)
+  return drizzle<typeof schema>(db)
 }
 
 export { schema }

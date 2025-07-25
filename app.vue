@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import Uppy from '@uppy/core'
+import Tus from '@uppy/tus'
+import { Dashboard } from '@uppy/vue'
+
+import '@uppy/core/dist/style.min.css'
+import '@uppy/dashboard/dist/style.min.css'
+
 import type { FileUploadUploaderEvent } from 'primevue/fileupload'
 
 const config = useRuntimeConfig()
 
 const { data, refresh, status } = useFetch('/api/files', { default: () => ({ files: [] }) })
-useIntervalFn(refresh, 5_000)
 
 const remove = async (id: string) => {
   await $fetch(`/api/files/${id}`, { method: 'DELETE' })
@@ -26,10 +32,13 @@ const uploader = async (e: FileUploadUploaderEvent) => {
   }))
 }
 
-const doGet = async (id: string) => {
+const fetchFile = async (id: string) => {
   await $fetch(`/api/files/${id}`, { method: 'GET' })
   console.info('Data refreshed')
 }
+
+const uppy = new Uppy()
+  .use(Tus, { endpoint: 'api/tus/upload' }) // we need to add a path after /tus
 </script>
 
 <template>
@@ -44,9 +53,18 @@ const doGet = async (id: string) => {
         target="_blank"
         :href="config.public.stripe.paymentLink"
       />
+      <Button
+        id="uppy-dashboard"
+        label="Upload"
+        icon="pi pi-upload"
+        severity="link"
+      />
     </div>
-    <!-- upload form -->
+
+    <Dashboard :uppy="uppy" />
+
     <FileUpload
+      v-if="false"
       url="/api/files"
       :multiple="true"
       accept="image/jpeg,image/png,image/jpg,application/pdf"
@@ -104,81 +122,60 @@ const doGet = async (id: string) => {
       </template>
     </FileUpload>
 
-    <!-- uploads table -->
-    <DataTable
-      :value="data.files"
-      :loading="status === 'pending'"
-      size="small"
-      data-key="id"
-    >
-      <Column
-        field="id"
-        header="ID"
-        sortable
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <Card
+        v-for="file in data.files"
+        :key="file.id"
       >
-        <template #body="{ data: { id } }">
-          <div
-            class="text-sm font-mono"
-            :title="id"
-          >
-            #<span class="hover:underline cursor-pointer">{{ id.slice(0, 8) }}</span>
+        <template #title>
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-mono hover:underline cursor-pointer">
+                #{{ file.id.slice(0, 8) }}
+              </span>
+              <i
+                class="pi pi-trash text-xs text-red-400 hover:text-red-600 cursor-pointer"
+                @click="() => remove(file.id)"
+              />
+              <i
+                class="pi pi-refresh text-xs text-green-400 hover:text-green-600 cursor-pointer"
+                @click="() => fetchFile(file.id)"
+              />
+            </div>
+            <NuxtTime
+              class="text-xs font-mono text-gray-500"
+              :datetime="file.created_at"
+              title
+              hour="2-digit"
+              minute="2-digit"
+            />
           </div>
         </template>
-      </Column>
-      <Column
-        field="file_name"
-        header="Filename"
-      >
-        <template #body="{ data: { key } }">
-          <span
-            class="text-sm font-mono"
-            :title="key"
-          >
-            {{ key.length > 11 ? key.slice(0, 14) + '...' : key }}
-          </span>
+        <template #subtitle>
+          <span class="text-sm font-mono">{{ file.key.substring(0, 14) + '...' }}</span>
         </template>
-      </Column>
-      <Column
-        field="meta"
-        header="Metadata"
-      />
-      <Column
-        field="created_at"
-        header="Created At"
-      >
-        <template #body="{ data: { created_at } }">
-          <NuxtTime
-            relative
-            title
-            :datetime="created_at"
-          />
+        <template #content>
+          <div>
+            <Skeleton
+              v-if="status === 'pending'"
+              class="min-h-16"
+            />
+            <template v-if="file.key.endsWith('.pdf')">
+              <div class="flex items-center justify-center w-full aspect-square">
+                <i class="pi pi-file-pdf text-2xl text-gray-500" />
+              </div>
+            </template>
+            <template v-else-if="file.key.endsWith('.jpg') || file.key.endsWith('.jpeg') || file.key.endsWith('.png')">
+              <div class="flex items-center justify-center w-full aspect-square">
+                <Image
+                  :src="`/api/blobs/${file.id}`"
+                  class="border rounded-lg"
+                />
+              </div>
+            </template>
+          </div>
         </template>
-      </Column>
-      <Column>
-        <template #body="{ data: { id, url } }">
-          <Button
-            icon="pi pi-trash"
-            severity="danger"
-            size="small"
-            @click="() => remove(id)"
-          />
-          <Button
-            icon="pi pi-refresh"
-            severity="secondary"
-            size="small"
-            @click="() => doGet(id)"
-          />
-          <Button
-            icon="pi pi-download"
-            severity="info"
-            size="small"
-            as="a"
-            :href="`/api/files/${id}/download`"
-            target="_blank"
-            title="Download file"
-          />
-        </template>
-      </Column>
-    </DataTable>
+      </Card>
+    </div>
   </main>
 </template>
