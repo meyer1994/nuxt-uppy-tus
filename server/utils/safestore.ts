@@ -9,19 +9,21 @@ export type StorePutOptions = {
   meta?: Record<string, string>
 }
 
+let s3: S3Client
 export default () => {
   const db = useDrizzle()
   const BUCKET = 'uploads'
 
-  const s3 = new S3Client({
-    region: 'us-east-1',
-    credentials: {
-      accessKeyId: 'minioadmin',
-      secretAccessKey: 'minioadmin',
-    },
-    endpoint: 'https://dev.jmeyer.dev',
-    forcePathStyle: true,
-  })
+  if (!s3)
+    s3 = new S3Client({
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: 'minioadmin',
+        secretAccessKey: 'minioadmin',
+      },
+      endpoint: 'https://dev.jmeyer.dev',
+      forcePathStyle: true,
+    })
 
   const fetch = async (id: string): Promise<FileSelect> => {
     const item = await db

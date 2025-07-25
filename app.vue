@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { FileUploadUploaderEvent } from 'primevue/fileupload'
 
+const config = useRuntimeConfig()
+
 const { data, refresh, status } = useFetch('/api/files', { default: () => ({ files: [] }) })
 useIntervalFn(refresh, 5_000)
 
@@ -33,6 +35,16 @@ const doGet = async (id: string) => {
 <template>
   <!-- full with with padding is defined here -->
   <main class="flex flex-col gap-4 min-h-screen p-4">
+    <div>
+      <Button
+        label="Pay"
+        icon="pi pi-wallet"
+        severity="link"
+        as="a"
+        target="_blank"
+        :href="config.public.stripe.paymentLink"
+      />
+    </div>
     <!-- upload form -->
     <FileUpload
       url="/api/files"

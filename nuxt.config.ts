@@ -2,7 +2,13 @@ import Material from '@primeuix/themes/material'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ['@nuxt/eslint', '@primevue/nuxt-module', '@nuxtjs/tailwindcss', '@vueuse/nuxt'],
+  modules: [
+    '@nuxt/eslint',
+    '@primevue/nuxt-module',
+    '@nuxtjs/tailwindcss',
+    '@vueuse/nuxt',
+    'nuxt-webhook-validators',
+  ],
 
   devtools: {
     enabled: true,
@@ -14,9 +20,14 @@ export default defineNuxtConfig({
   css: ['primeicons/primeicons.css'],
 
   runtimeConfig: {
-    openai: {
-      model: 'gpt-4o-mini',
-      apiKey: process.env.OPENAI_API_KEY,
+    stripe: {
+      secretKey: process.env.NUXT_STRIPE_SECRET_KEY,
+      webhookSecret: process.env.NUXT_STRIPE_WEBHOOK_SECRET,
+    },
+    public: {
+      stripe: {
+        paymentLink: process.env.NUXT_STRIPE_PAYMENT_LINK,
+      },
     },
   },
 
@@ -32,16 +43,6 @@ export default defineNuxtConfig({
         options: {
           url: process.env.DATABASE_URL,
         },
-      },
-    },
-    storage: {
-      s3: {
-        driver: 's3',
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        endpoint: process.env.AWS_ENDPOINT,
-        bucket: process.env.AWS_BUCKET,
-        region: process.env.AWS_REGION,
       },
     },
   },

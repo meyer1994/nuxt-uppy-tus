@@ -1,5 +1,4 @@
 import useSafestore from '~/server/utils/safestore'
-import type { AIMimeTypes } from '~/server/utils/useAi'
 
 export default defineEventHandler(async (event) => {
   const form = await readMultipartFormData(event)
@@ -9,8 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const files = await Promise.all(form.map(async (file) => {
     const filename = file.filename || 'unknown'
-    const mimeType = file.type as AIMimeTypes
-    return await storage.put(filename, file.data, { contentType: mimeType })
+    return await storage.put(filename, file.data, { contentType: file.type })
   }))
 
   return { files }
