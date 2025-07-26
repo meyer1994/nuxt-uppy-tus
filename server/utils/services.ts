@@ -34,7 +34,7 @@ const useTus = () => {
         },
       }),
       onUploadFinish: async (req, upload) => {
-        console.info('Upload finished:', upload.id)
+        console.info('TUS upload finished:', upload.id)
 
         const db = useDrizzle()
         await db

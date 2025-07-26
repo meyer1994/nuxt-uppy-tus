@@ -19,12 +19,18 @@ const fetchFile = async (id: string) => {
 
 let uppy: Uppy<TusBody, Record<string, never>>
 onMounted(() => {
-  uppy = new Uppy<TusBody, Record<string, never>>()
+  uppy = new Uppy<TusBody, Record<string, never>>({
+    debug: true,
+    restrictions: { allowedFileTypes: ['image/*'] },
+  })
     .use(Tus, {
       endpoint: 'api/tus/upload',
       removeFingerprintOnSuccess: true,
     })
-    .use(Webcam)
+    .use(Webcam, {
+      modes: ['picture'],
+      mobileNativeCamera: true,
+    })
 
   // triggered when all uploads complete
   uppy.on('complete', async (result) => {
@@ -62,9 +68,11 @@ const remove = async (id: string) => {
       />
     </div>
 
-    <ClientOnly>
-      <Dashboard :uppy="uppy" />
-    </ClientOnly>
+    <div class="w-full">
+      <ClientOnly>
+        <Dashboard :uppy="uppy" />
+      </ClientOnly>
+    </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
       <Card
@@ -103,24 +111,15 @@ const remove = async (id: string) => {
           <span class="text-sm font-mono">{{ file.key.substring(0, 14) + '...' }}</span>
         </template>
         <template #content>
-          <div>
+          <div class="flex items-center justify-center">
             <Skeleton
               v-if="status === 'pending'"
               class="min-h-16"
             />
-            <template v-if="file.key.endsWith('.pdf')">
-              <div class="flex items-center justify-center w-full aspect-square">
-                <i class="pi pi-file-pdf text-2xl text-gray-500" />
-              </div>
-            </template>
-            <template v-else-if="file.key.endsWith('.jpg') || file.key.endsWith('.jpeg') || file.key.endsWith('.png')">
-              <div class="flex items-center justify-center w-full aspect-square">
-                <Image
-                  :src="`/api/blobs/${file.key}`"
-                  class="border rounded-lg"
-                />
-              </div>
-            </template>
+            <Image
+              :src="`/api/tus/uploads/${file.key}`"
+              class="border rounded-lg w-full"
+            />
           </div>
         </template>
       </Card>
