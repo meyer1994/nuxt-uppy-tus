@@ -14,14 +14,7 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
-    "@ai-sdk/openai": "2.0.0-beta.11",
-    "@aws-sdk/client-s3": "^3.850.0",
-    "@aws-sdk/s3-request-presigner": "^3.850.0",
-    "@libsql/client": "^0.15.10",
-    "@primeuix/themes": "^1.2.1",
-    "@primevue/forms": "^4.3.6",
     "@tus/file-store": "^2.0.0",
-    "@tus/s3-store": "^2.0.0",
     "@tus/server": "^2.2.0",
     "@uppy/core": "^4.4.7",
     "@uppy/dashboard": "^4.3.4",
@@ -31,36 +24,14 @@
     "@uppy/tus": "^4.2.2",
     "@uppy/vue": "^2.3.0",
     "@uppy/webcam": "^4.2.1",
-    "@vueuse/core": "^13.5.0",
-    "@vueuse/nuxt": "^13.5.0",
-    "ai": "5.0.0-beta.25",
-    "aws4fetch": "^1.0.20",
-    "db0": "^0.3.2",
-    "drizzle-orm": "^0.44.3",
-    "nuxt": "^3.17.7",
-    "nuxt-webhook-validators": "0.2.2",
-    "openai": "^5.10.2",
-    "pg": "^8.16.3",
-    "primeicons": "^7.0.0",
-    "primevue": "^4.3.6",
-    "stripe": "^18.3.0",
-    "unstorage": "^1.16.1",
+    "nuxt": "^4.0.1",
     "vue": "^3.5.18",
-    "vue-router": "^4.5.1",
-    "zod": "^3.25.76"
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@nuxt/eslint": "1.5.2",
-    "@nuxt/image": "^1.10.0",
-    "@nuxtjs/tailwindcss": "6.14.0",
-    "@primevue/nuxt-module": "^4.3.6",
-    "@types/pg": "^8.15.4",
-    "aws-cdk": "^2.1021.0",
-    "aws-cdk-lib": "^2.206.0",
-    "dotenv": "^17.2.0",
-    "drizzle-kit": "^0.31.4",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "typescript": "^5.8.3",
-    "vue-tsc": "^3.0.3"
+    "vue-tsc": "^3.0.4"
   }
 }
