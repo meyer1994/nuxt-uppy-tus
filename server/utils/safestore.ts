@@ -1,7 +1,8 @@
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { asc, eq, sql } from 'drizzle-orm'
 import useDrizzle from '~/server/utils/drizzle'
+import { useTus } from '~/server/utils/services'
 
 export type StorePutOptions = {
   contentType?: string
@@ -11,6 +12,7 @@ export type StorePutOptions = {
 
 let s3: S3Client
 export default () => {
+  const tus = useTus()
   const db = useDrizzle()
   const BUCKET = 'uploads'
 
@@ -40,7 +42,7 @@ export default () => {
   const update = async (id: string, meta: Record<string, string>): Promise<FileSelect> => {
     const row = await db
       .update(schema.files)
-      .set({ meta })
+      .set({ meta: sql`meta || ${JSON.stringify({ data: meta })}::jsonb` })
       .where(eq(schema.files.id, id))
       .returning()
       .get()
@@ -50,6 +52,9 @@ export default () => {
     return row
   }
 
+  /**
+   * @deprecated
+   */
   const exists = async (id: string): Promise<boolean> => {
     try {
       await get(id)
@@ -60,6 +65,9 @@ export default () => {
     }
   }
 
+  /**
+   * @deprecated
+   */
   const get = async (id: string): Promise<ReadableStream> => {
     await fetch(id) // errors if not found
 
@@ -75,11 +83,14 @@ export default () => {
     return response.Body?.transformToWebStream()
   }
 
+  /**
+   * @deprecated
+   */
   const put = async (key: string, data: ReadableStream | Blob | Buffer, opts?: StorePutOptions): Promise<FileSelect> => {
     // update if exists
     let row = await db
       .update(schema.files)
-      .set({ meta: opts?.meta || {}, key })
+      .set({ meta: sql`meta || ${JSON.stringify({ data: opts?.meta })}::jsonb` })
       .where(eq(schema.files.key, key))
       .returning()
       .get()
@@ -88,7 +99,7 @@ export default () => {
     if (!row) {
       row = await db
         .insert(schema.files)
-        .values({ meta: opts?.meta || {}, key })
+        .values({ meta: sql`${JSON.stringify({ data: opts?.meta })}::jsonb`, key })
         .returning()
         .get()
     }
@@ -107,6 +118,9 @@ export default () => {
     return row
   }
 
+  /**
+   * @deprecated
+   */
   const del = async (id: string): Promise<FileSelect> => {
     const item = await db
       .delete(schema.files)
@@ -115,13 +129,7 @@ export default () => {
       .get()
 
     if (!item) throw new Error(`File not found: ${id}`)
-
-    const command = new DeleteObjectCommand({
-      Bucket: BUCKET,
-      Key: item.key,
-    })
-
-    await s3.send(command)
+    await tus.datastore.remove(item.key)
 
     return item
   }

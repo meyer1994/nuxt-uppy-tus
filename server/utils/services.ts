@@ -1,6 +1,8 @@
 import { S3Store } from '@tus/s3-store'
 import { Server } from '@tus/server'
+import { eq } from 'drizzle-orm'
 import Stripe from 'stripe'
+import useDrizzle from '~/server/utils/drizzle'
 
 let stripe: Stripe | null = null
 const useStripe = (): Stripe => {
@@ -31,6 +33,25 @@ const useTus = () => {
           forcePathStyle: true,
         },
       }),
+      onUploadFinish: async (req, upload) => {
+        console.info('Upload finished:', upload.id)
+
+        const db = useDrizzle()
+        await db
+          .insert(schema.files)
+          .values({ key: upload.id, meta: { uppy: { onUploadFinish: upload } } })
+
+        return { status_code: 200 }
+      },
+      onIncomingRequest: async (req, uploadId) => {
+        console.info('TUS request:', uploadId)
+        if (req.method !== 'DELETE') return
+
+        const db = useDrizzle()
+        await db
+          .delete(schema.files)
+          .where(eq(schema.files.key, uploadId))
+      },
     },
   )
 

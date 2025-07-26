@@ -1,5 +1,13 @@
+import type { Upload } from '@tus/server'
 import { sql } from 'drizzle-orm'
 import { jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+
+export interface FileMeta {
+  uppy: {
+    onUploadFinish: Upload
+  }
+  data?: unknown
+}
 
 export const files = pgTable('files', {
   id: uuid('id')
@@ -9,7 +17,7 @@ export const files = pgTable('files', {
     .notNull(),
   meta: jsonb('meta')
     .notNull()
-    .$type<Record<string, string>>()
+    .$type<FileMeta>()
     .default(sql`'{}'`),
   created_at: timestamp('created_at', { withTimezone: true })
     .notNull()

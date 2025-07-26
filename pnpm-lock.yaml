@@ -55,7 +55,10 @@ importers:
         version: 4.2.2(@uppy/core@4.4.7)
       '@uppy/vue':
         specifier: ^2.3.0
-        version: 2.3.0(@uppy/core@4.4.7)(@uppy/dashboard@4.3.4(@uppy/core@4.4.7))(@uppy/drag-drop@4.1.3(@uppy/core@4.4.7))(@uppy/file-input@4.1.3(@uppy/core@4.4.7))(@uppy/progress-bar@4.2.1(@uppy/core@4.4.7))(@uppy/status-bar@4.1.3(@uppy/core@4.4.7))(vue@3.5.18(typescript@5.8.3))
+        version: 2.3.0(@uppy/core@4.4.7)(@uppy/dashboard@4.3.4(@uppy/core@4.4.7))(@uppy/drag-drop@4.1.3(@uppy/core@4.4.7))(@uppy/file-input@4.1.3(@uppy/core@4.4.7))(@uppy/progress-bar@4.2.1(@uppy/core@4.4.7))(@uppy/status-bar@4.1.3(@uppy/core@4.4.7))(@uppy/webcam@4.2.1(@uppy/core@4.4.7))(vue@3.5.18(typescript@5.8.3))
+      '@uppy/webcam':
+        specifier: ^4.2.1
+        version: 4.2.1(@uppy/core@4.4.7)
       '@vueuse/core':
         specifier: ^13.5.0
         version: 13.5.0(vue@3.5.18(typescript@5.8.3))
@@ -2294,6 +2297,11 @@ packages:
       '@uppy/status-bar':
         optional: true
 
+  '@uppy/webcam@4.2.1':
+    resolution: {integrity: sha512-zcQVvYlVqszZCDVoVZVssV0BwEYy3/fg9hqqusT42P2LVFmo8AKrIkK0oDFBfLimMGU5ofa5WYH6kdiWEKv+zA==}
+    peerDependencies:
+      '@uppy/core': ^4.4.7
+
   '@vercel/nft@0.29.4':
     resolution: {integrity: sha512-6lLqMNX3TuycBPABycx7A9F1bHQR7kiQln6abjFbPrf5C/05qHM9M5E4PeTE59c7z8g6vHnx1Ioihb2AQl7BTA==}
     engines: {node: '>=18'}
@@ -3986,6 +3994,9 @@ packages:
   is-installed-globally@1.0.0:
     resolution: {integrity: sha512-K55T22lfpQ63N4KEN57jZUAaAYqYHEe8veb/TycJRk9DdSCLLcovXz/mL6mOnhQaZsQGwPhuFopdQIlqGSEjiQ==}
     engines: {node: '>=18'}
+
+  is-mobile@4.0.0:
+    resolution: {integrity: sha512-mlcHZA84t1qLSuWkt2v0I2l61PYdyQDt4aG1mLIXF5FDMm4+haBCxCPYSr/uwqQNRk1MiTizn0ypEuRAOLRAew==}
 
   is-module@1.0.0:
     resolution: {integrity: sha512-51ypPSPCoTEIN9dy5Oy+h4pShgJmPCygKfyRCISBI+JoWT/2oJvK8QPxmwv7b/p239jXrm9M1mlQbyKJ5A152g==}
@@ -8887,7 +8898,7 @@ snapshots:
       namespace-emitter: 2.0.1
       p-retry: 6.2.1
 
-  '@uppy/components@0.2.0(@uppy/core@4.4.7)':
+  '@uppy/components@0.2.0(@uppy/core@4.4.7)(@uppy/webcam@4.2.1(@uppy/core@4.4.7))':
     dependencies:
       '@tailwindcss/cli': 4.1.11
       '@uppy/core': 4.4.7
@@ -8897,6 +8908,8 @@ snapshots:
       preact: 10.26.9
       pretty-bytes: 6.1.1
       tailwindcss: 4.1.11
+    optionalDependencies:
+      '@uppy/webcam': 4.2.1(@uppy/core@4.4.7)
 
   '@uppy/core@4.4.7':
     dependencies:
@@ -8986,9 +8999,9 @@ snapshots:
       lodash: 4.17.21
       preact: 10.26.9
 
-  '@uppy/vue@2.3.0(@uppy/core@4.4.7)(@uppy/dashboard@4.3.4(@uppy/core@4.4.7))(@uppy/drag-drop@4.1.3(@uppy/core@4.4.7))(@uppy/file-input@4.1.3(@uppy/core@4.4.7))(@uppy/progress-bar@4.2.1(@uppy/core@4.4.7))(@uppy/status-bar@4.1.3(@uppy/core@4.4.7))(vue@3.5.18(typescript@5.8.3))':
+  '@uppy/vue@2.3.0(@uppy/core@4.4.7)(@uppy/dashboard@4.3.4(@uppy/core@4.4.7))(@uppy/drag-drop@4.1.3(@uppy/core@4.4.7))(@uppy/file-input@4.1.3(@uppy/core@4.4.7))(@uppy/progress-bar@4.2.1(@uppy/core@4.4.7))(@uppy/status-bar@4.1.3(@uppy/core@4.4.7))(@uppy/webcam@4.2.1(@uppy/core@4.4.7))(vue@3.5.18(typescript@5.8.3))':
     dependencies:
-      '@uppy/components': 0.2.0(@uppy/core@4.4.7)
+      '@uppy/components': 0.2.0(@uppy/core@4.4.7)(@uppy/webcam@4.2.1(@uppy/core@4.4.7))
       '@uppy/core': 4.4.7
       preact: 10.26.9
       shallow-equal: 3.1.0
@@ -9006,6 +9019,13 @@ snapshots:
       - '@uppy/remote-sources'
       - '@uppy/screen-capture'
       - '@uppy/webcam'
+
+  '@uppy/webcam@4.2.1(@uppy/core@4.4.7)':
+    dependencies:
+      '@uppy/core': 4.4.7
+      '@uppy/utils': 6.1.5
+      is-mobile: 4.0.0
+      preact: 10.26.9
 
   '@vercel/nft@0.29.4(rollup@4.45.1)':
     dependencies:
@@ -10806,6 +10826,8 @@ snapshots:
     dependencies:
       global-directory: 4.0.1
       is-path-inside: 4.0.0
+
+  is-mobile@4.0.0: {}
 
   is-module@1.0.0: {}
 

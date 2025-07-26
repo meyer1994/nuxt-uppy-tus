@@ -30,6 +30,7 @@
     "@uppy/progress-bar": "^4.2.1",
     "@uppy/tus": "^4.2.2",
     "@uppy/vue": "^2.3.0",
+    "@uppy/webcam": "^4.2.1",
     "@vueuse/core": "^13.5.0",
     "@vueuse/nuxt": "^13.5.0",
     "ai": "5.0.0-beta.25",
