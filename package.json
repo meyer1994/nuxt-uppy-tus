@@ -9,9 +9,7 @@
     "typecheck": "nuxt typecheck",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@tus/file-store": "^2.0.0",
